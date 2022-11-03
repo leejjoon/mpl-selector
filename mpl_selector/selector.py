@@ -100,17 +100,25 @@ class Selector:
             k = tuple(row)
             kk.setdefault(k, []).append(i)
 
-        kk_keys = [k for k, ii in kk.items() if len(ii) % ncat == 0]
-        artist_indices = [kk[k] for k in kk_keys]
+        if len(kk) == 1 and () in kk:
+            group_keys = [(df["class"].iloc[0], dict())]
+            group_indices = [kk[()]]
+        else:
 
-        du = pd.DataFrame(kk_keys, columns=cols)
-        group_keys = []
-        group_indices = []
-        for klass, g in du.groupby("class"):
-            _cols = [cn for cn in g if g[cn].nunique() > 1]
-            for i, row in g[_cols].iterrows():
-                group_keys.append((klass, dict(row)))
-                group_indices.append(artist_indices[row.name])
+            kk_keys = [k for k, ii in kk.items() if len(ii) % ncat == 0]
+            artist_indices = [kk[k] for k in kk_keys]
+
+            if len(kk_keys) == 0:
+                raise RuntimeError("no grouping keywords are identified. You may need to ignore some of the properties, e.g., 'fc' if fc within the group is different.")
+
+            du = pd.DataFrame(kk_keys, columns=cols)
+            group_keys = []
+            group_indices = []
+            for klass, g in du.groupby("class"):
+                _cols = [cn for cn in g if g[cn].nunique() > 1]
+                for i, row in g[_cols].iterrows():
+                    group_keys.append((klass, dict(row)))
+                    group_indices.append(artist_indices[row.name])
 
         r = GroupedSelector(self.ax,
                             self.artists,
