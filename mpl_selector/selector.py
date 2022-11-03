@@ -338,7 +338,65 @@ class GroupedSelector:
                                       **kw)
         r = [self.artists[i] for i in indices]
 
-        return r
+        return GroupSelectee(self, r)
 
 
+import collections
+
+class GroupSelectee(collections.abc.Sequence):
+    def __init__(self, group_selector, artists=None):
+        self._group_selector = group_selector
+        # self._indices = {} if indices is None else set(indices)
+        self._artists = [] if artists is None else list(artists)
+
+    def __getitem__(self, index):
+        return self._artists[index]
+
+    def __len__(self):
+        return len(self._artists)
+
+    def union(self, klass="", *kl, **kwargs):
+        _new_artists = self.select(klass, *kl, **kwargs)
+        artists = set(self._artists).union(_new_artists)
+        return type(self)(self._group_selector, artists)
+
+    def difference(self, klass="", *kl, **kwargs):
+        _new_artists = self.select(klass, *kl, **kwargs)
+        artists = set(self._artists).difference(_new_artists)
+        return type(self)(self._group_selector, artists)
+
+    def select(self, klass_re, category=None, slice_mode=None,
+               **kw):
+        """
+
+        slice_mode : None or "step"
+            FIXME: need better name or approach
+            This tells how to select artists if a group has more than ncat.
+            If "step", it will do the slice of [i::ncat].
+            If None, which is the default, it does slice of [i*s:(i+1)*s] where s = len(r) // ncat.
+        """
+        group_selector = self._group_selector
+        artists = group_selector.select(klass_re, category=category,
+                                        slice_mode=slice_mode,
+                                        **kw)
+
+        return artists
+
+    def set(self, prop, *kl, ignore_error=False, **kwargs):
+        for a in self:
+            try:
+                getattr(a, "set_"+prop)(*kl, **kwargs)
+            except AttributeError:
+                if ignore_error:
+                    continue
+                else:
+                    raise
+
+        return self
+
+
+if False:
+    p = GroupSelectee(grouped_selector, [])
+    p1 = p.union("Line")
+    p2 = p1.difference(category="Sat")
 

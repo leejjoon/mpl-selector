@@ -14,18 +14,12 @@ ax = sns.boxplot(x="day", y="total_bill",
                  data=tips)
 sns.despine(offset=10, trim=True)
 
-from mpl_selector import Selector, groupby
 from mpl_visual_context.patheffects import HLSModifyStroke
+pe = [HLSModifyStroke(ds=-0.2, l="-60%")]
 
+from mpl_selector import Selector
 selector = Selector(ax)
 grouped_selector = selector.guess_categorical(axis="x")
-
-pe = [HLSModifyStroke(ds=-0.2, l="-50%")]
-
-for a in grouped_selector.select(""):
-    a.set_path_effects(pe)
-
-for a in grouped_selector.select("", category="Sat"):
-    a.set_path_effects(None)
+grouped_selector.select("").difference(category="Sat").set("path_effects", pe)
 
 plt.show()
