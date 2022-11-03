@@ -261,3 +261,18 @@ class GroupSelectee(collections.abc.Sequence):
 
         return self
 
+    def groupby(self, k, values_only=False):
+        """
+        by default return sorted list
+        """
+        l = [(getattr(self._artists_orig[i], "get_"+k, NA)(), i)
+             for i in self.indices]
+
+        _m = _groupby(sorted(l), key=itemgetter(0))
+        m = list((k, type(self)(self._group_selector, list(i for _, i in v)))
+                 for k, v in _m)
+
+        if values_only:
+            return [v for k, v in m]
+        else:
+            return m
