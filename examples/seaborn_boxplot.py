@@ -19,11 +19,8 @@ sns.boxplot(x="day", y="total_bill",
             data=tips, ax=ax)
 sns.despine(offset=10, trim=True)
 
-from mpl_visual_context.patheffects import HLSModifyStroke
-pe = [HLSModifyStroke(s="50%", l="-50%")]
-
 selector = Selector(ax)
 grouped_selector = selector.guess_categorical(axis="x")
-grouped_selector.select("").difference(category="Sat").set("path_effects", pe)
+grouped_selector.select("").difference(category="Sat").set("alpha", 0.5)
 
 plt.show()

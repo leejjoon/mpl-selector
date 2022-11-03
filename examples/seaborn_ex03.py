@@ -1,7 +1,6 @@
 import matplotlib.pyplot as plt
 import seaborn as sns
-from mpl_selector import Selector, groupby
-from mpl_visual_context.patheffects import HLSModifyStroke
+from mpl_selector import Selector
 
 sns.set_theme(style="whitegrid")
 
@@ -15,15 +14,8 @@ ax = sns.boxenplot(x="clarity", y="carat",
 
 selector = Selector(ax)
 grouped_selector = selector.guess_categorical(axis="x")
-print(grouped_selector.group_keys)
 
-pe = [HLSModifyStroke(dh=0.25)]
-
-for a in grouped_selector.select("PatchColl", category="VVS2"):
-    a.set_path_effects(pe)
-
-for a in grouped_selector.select("Line"):
-    a.set_lw("2")
-    a.set_color("y")
+grouped_selector.select("", category="VVS2").set("alpha", 0.2)
+grouped_selector.select("Line").set("lw", 2).set("color", "y")
 
 plt.show()

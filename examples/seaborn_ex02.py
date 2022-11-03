@@ -1,7 +1,6 @@
 import matplotlib.pyplot as plt
 import seaborn as sns
 from mpl_selector import Selector, groupby
-from mpl_visual_context.patheffects import HLSModifyStroke
 
 sns.set_theme(style="whitegrid")
 
@@ -21,15 +20,6 @@ selector = Selector(g.ax)
 grouped_selector = selector.guess_categorical(axis="x")
 grouped_selector.import_legend(g.legend)
 
-# pe1 = [ColorModifyStroke(ds=-0., dl=0.3)]
-pe = [HLSModifyStroke(ds=-0.3, dl=0.3)]
-
-for a in grouped_selector.select("Rect"):
-    a.set_path_effects(pe)
-
-for a in grouped_selector.select("Rect", category="Gentoo"):
-    a.set_path_effects(None)
-
-# print(grouped_selector.group_keys)
+grouped_selector.select("Rect").difference("", category="Gentoo").set("alpha", 0.5)
 
 plt.show()
